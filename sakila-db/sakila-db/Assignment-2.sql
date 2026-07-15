@@ -13,6 +13,7 @@ HAVING COUNT(*) > 1;
 
 
 -- Q2: Number of times letter 'a' is repeated in film descriptions
+
 SELECT SUM(
          LENGTH(LOWER(description)) - LENGTH(REPLACE(LOWER(description), 'a', ''))
        ) AS total_a_count
@@ -58,8 +59,8 @@ GROUP BY customer_id, YEAR(payment_date), WEEK(payment_date)
 ORDER BY customer_id, payment_year, payment_week;
 
 
--- Q5: Check if any given year is a leap year or not 
--- (hardcoded date, no Sakila table)
+-- Q5: Check if any given year is a leap year or not  (hardcoded date, no Sakila table)
+
 SELECT 2024 AS year_checked,
        CASE 
            WHEN (2024 % 4 = 0 AND 2024 % 100 <> 0) OR (2024 % 400 = 0)
@@ -69,12 +70,13 @@ SELECT 2024 AS year_checked,
 
 
 -- Q6: Display number of days remaining in the current year from today
+
 SELECT CURDATE() AS today,
        DATEDIFF(CONCAT(YEAR(CURDATE()), '-12-31'), CURDATE()) AS days_remaining_in_year;
 
 
--- Q7: Display quarter number (Q1, Q2, Q3, Q4) for payment dates 
--- from payment table
+-- Q7: Display quarter number (Q1, Q2, Q3, Q4) for payment dates from payment table
+
 SELECT payment_id,
        payment_date,
        CONCAT('Q', QUARTER(payment_date)) AS payment_quarter
