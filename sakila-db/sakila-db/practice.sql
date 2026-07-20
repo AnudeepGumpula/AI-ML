@@ -139,6 +139,77 @@ CALL GetCustomersByStore(2);
 -- inputs whenever I need it, instead of rewriting the whole query.
 
 
+-- Practice: Keys & Indexes
+
+-- Q1: Identify the surrogate key in the customer table, and write a query that retrieves customers using it.
+SELECT customer_id, first_name, last_name
+FROM customer
+WHERE customer_id = 5;
+-- customer_id is the surrogate key: auto-generated, no real-world meaning.
+
+
+-- Q2: Identify a possible natural key in the customer table, and write a query that retrieves a customer using it instead.
+SELECT customer_id, first_name, last_name, email
+FROM customer
+WHERE email = 'MARY.SMITH@sakilacustomer.org';
+-- email is a natural key candidate: real-world data that could (in theory) uniquely identify a customer.
+
+
+-- Q3: Create an index on the film table's title column, since it's commonly searched/filtered on.
+CREATE INDEX idx_film_title ON film(title);
+
+-- Now test that a title search can use this index:
+SELECT * FROM film WHERE title = 'ACADEMY DINOSAUR';
+
+
+-- Q4: Create an index on the customer table's last_name column.
+CREATE INDEX idx_customer_lastname ON customer(last_name);
+
+SELECT * FROM customer WHERE last_name = 'SMITH';
+
+
+-- Q5: Check which indexes already exist on the customer table.
+SHOW INDEX FROM customer;
+-- Notice: customer_id (primary key) is already indexed automatically, since it's the clustered index.
+
+
+-- Q6: Check which indexes already exist on the film table.
+SHOW INDEX FROM film;
+
+
+-- Q7: Identify the clustered index of the rental table (this will be the primary key by default in InnoDB).
+SHOW INDEX FROM rental WHERE Key_name = 'PRIMARY';
+
+
+-- Q8: Create a composite (multi-column) non-clustered index on payment table's customer_id and payment_date, 
+-- since queries often filter by both together.
+CREATE INDEX idx_payment_customer_date ON payment(customer_id, payment_date);
+
+-- Test it with a query that uses both columns:
+SELECT * FROM payment 
+WHERE customer_id = 5 AND payment_date >= '2005-05-01';
+
+
+-- Q9: Drop an index you created (cleanup / practice reversing it).
+DROP INDEX idx_film_title ON film;
+
+
+-- Q10: Use EXPLAIN to see whether a query uses an index or does a full table scan.
+EXPLAIN SELECT * FROM customer WHERE last_name = 'SMITH';
+-- Check the 'key' column in the output — if it shows idx_customer_lastname, the index is being used. 
+-- If it says NULL, MySQL did a full table scan instead.
+
+
+-- Q11: Compare EXPLAIN output for a column WITHOUT an index, to see the performance difference conceptually.
+EXPLAIN SELECT * FROM customer WHERE first_name = 'MARY';
+-- first_name has no index, so this likely does a full table scan (unless MySQL decides otherwise based on table size/stats).
+
+
+-- Q12: Identify why customer_id is a better primary/surrogate key than email, by testing what happens if email format changes.
+
+-- If a customer's email changes, customer_id stays the same, so all foreign key references (in rental, payment, etc.) remain valid.
+-- If email were used as the key instead, every related table would need updating whenever the email changes — this is why 
+-- surrogate keys are preferred for primary keys in practice.
 
 
 
